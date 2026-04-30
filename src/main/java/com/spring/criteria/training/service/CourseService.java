@@ -1,0 +1,15 @@
+package com.spring.criteria.training.service;
+
+import org.springframework.data.domain.Page;
+
+import com.spring.criteria.training.dto.course.CourseRequestCreateDTO;
+import com.spring.criteria.training.dto.course.CourseResponseDTO;
+import com.spring.criteria.training.dto.course.CourseSearchDTO;
+import com.spring.criteria.training.exception.EntityNotFoundException;
+
+public interface CourseService {
+
+	CourseResponseDTO createCourse(CourseRequestCreateDTO request) throws EntityNotFoundException;
+
+	Page<CourseResponseDTO> getCourses(CourseSearchDTO filter);
+}

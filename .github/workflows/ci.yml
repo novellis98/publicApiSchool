@@ -1,0 +1,21 @@
+name: Spring Boot CI
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Test pipeline
+        run: echo "Pipeline funziona"
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 25

@@ -1,0 +1,10 @@
+spring.application.name=spring.criteria.training
+# connessione db
+spring.datasource.url=jdbc:postgresql://localhost:5432/YOUR_DB
+spring.datasource.username=YOUR_USERNAME
+spring.datasource.password=YOUR_PASSWORD
+spring.datasource.driver-class-name=org.postgresql.Driver
+#
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
