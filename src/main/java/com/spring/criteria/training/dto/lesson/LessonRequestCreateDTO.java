@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 public class LessonRequestCreateDTO {
-	String Title;
+	String title;
 	Long courseId;
 }

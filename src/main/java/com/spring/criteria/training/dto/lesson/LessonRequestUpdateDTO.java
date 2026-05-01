@@ -1,7 +1,5 @@
 package com.spring.criteria.training.dto.lesson;
 
-import com.spring.criteria.training.dto.course.CourseSummaryDTO;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,9 +7,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class LessonResponseDTO {
+public class LessonRequestUpdateDTO {
 	Long id;
 	String title;
-	CourseSummaryDTO course;
-
+	Long courseId;
 }
