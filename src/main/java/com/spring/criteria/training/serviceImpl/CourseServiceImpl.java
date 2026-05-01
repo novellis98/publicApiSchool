@@ -3,6 +3,7 @@ package com.spring.criteria.training.serviceImpl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -12,12 +13,14 @@ import org.springframework.stereotype.Service;
 
 import com.spring.criteria.training.constants.AppConstants;
 import com.spring.criteria.training.dto.course.CourseRequestCreateDTO;
+import com.spring.criteria.training.dto.course.CourseRequestUpdateDTO;
 import com.spring.criteria.training.dto.course.CourseResponseDTO;
 import com.spring.criteria.training.dto.course.CourseSearchDTO;
 import com.spring.criteria.training.dto.lesson.LessonSummaryDTO;
 import com.spring.criteria.training.dto.teacher.TeacherSummaryDTO;
 import com.spring.criteria.training.exception.EntityNotFoundException;
 import com.spring.criteria.training.mapper.CourseMapper;
+import com.spring.criteria.training.mapper.LessonMapper;
 import com.spring.criteria.training.mapper.TeacherMapper;
 import com.spring.criteria.training.model.Course;
 import com.spring.criteria.training.model.Teacher;
@@ -49,6 +52,8 @@ public class CourseServiceImpl implements CourseService {
 	private CourseMapper courseMapper;
 	@Autowired
 	private TeacherMapper teacherMapper;
+	@Autowired
+	private LessonMapper lessonMapper;
 
 	@Override
 	public CourseResponseDTO createCourse(CourseRequestCreateDTO request) throws EntityNotFoundException {
@@ -132,6 +137,58 @@ public class CourseServiceImpl implements CourseService {
 		}).toList();
 
 		return new PageImpl<>(response, PageRequest.of(page, size), total);
+	}
+
+	@Override
+	public CourseResponseDTO updateCourse(CourseRequestUpdateDTO request) throws EntityNotFoundException {
+//recupero corso da aggiornare
+		Course course = courseRepository.findByIdWithLessons(request.getId())
+				.orElseThrow(() -> new EntityNotFoundException("Course not found"));
+//	recupero teacher
+		Teacher teacher = teacherRepository.findById(request.getTeacherId())
+				.orElseThrow(() -> new EntityNotFoundException("Teacher not found"));
+//		setto valori sul corso per aggiornarlo
+		course.setTitle(request.getTitle());
+		course.setTeacher(teacher);
+
+		Course saved = courseRepository.save(course);
+//creo response
+		CourseResponseDTO response = courseMapper.toDTO(saved);
+//		creo dto del teacher da mettere in response
+		TeacherSummaryDTO teacherDTO = teacherMapper.toDTOSummary(teacher);
+		response.setTeacher(teacherDTO);
+//recupero lista lezioni
+		List<LessonSummaryDTO> lessons = course.getLessons().stream().map(l -> {
+			return lessonMapper.toSummaryDTO(l);
+		}).collect(Collectors.toList());
+		response.setLessons(lessons);
+		return response;
+
+	}
+
+	@Override
+	public CourseResponseDTO getCourse(Long id) throws EntityNotFoundException {
+		// recupero corso
+		Course course = courseRepository.findByIdWithLessons(id)
+				.orElseThrow(() -> new EntityNotFoundException("Course not found"));
+
+		CourseResponseDTO response = courseMapper.toDTO(course);
+		TeacherSummaryDTO teacherDTO = teacherMapper.toDTOSummary(course.getTeacher());
+		response.setTeacher(teacherDTO);
+		// recupero lista lezioni
+		List<LessonSummaryDTO> lessons = course.getLessons().stream().map(l -> {
+			return lessonMapper.toSummaryDTO(l);
+		}).collect(Collectors.toList());
+		response.setLessons(lessons);
+		return response;
+	}
+
+	@Override
+	public void deleteCourse(Long id) throws EntityNotFoundException {
+		// recupero corso
+		Course course = courseRepository.findById(id)
+				.orElseThrow(() -> new EntityNotFoundException("Course not found"));
+		courseRepository.delete(course);
 	}
 
 	// ── HELPERS ───────────────────────────────────────────

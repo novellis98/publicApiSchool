@@ -4,14 +4,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.spring.criteria.training.dto.course.CourseRequestCreateDTO;
+import com.spring.criteria.training.dto.course.CourseRequestUpdateDTO;
 import com.spring.criteria.training.dto.course.CourseResponseDTO;
 import com.spring.criteria.training.dto.course.CourseSearchDTO;
 import com.spring.criteria.training.exception.EntityNotFoundException;
@@ -24,7 +28,7 @@ public class CourseController {
 	private CourseService courseService;
 
 	@PostMapping
-	public ResponseEntity<?> createStudent(@RequestBody CourseRequestCreateDTO request) {
+	public ResponseEntity<?> createCourse(@RequestBody CourseRequestCreateDTO request) {
 
 		CourseResponseDTO response = null;
 		try {
@@ -41,5 +45,43 @@ public class CourseController {
 		Page<CourseResponseDTO> response = courseService.getCourses(request);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 
+	}
+
+	@PutMapping
+	public ResponseEntity<?> updateCourse(@RequestBody CourseRequestUpdateDTO request) {
+
+		CourseResponseDTO response = null;
+		try {
+			response = courseService.updateCourse(request);
+		} catch (EntityNotFoundException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+		}
+
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+	@GetMapping("/{id}")
+	public ResponseEntity<?> getCourse(@PathVariable Long id) {
+
+		CourseResponseDTO response = null;
+		try {
+			response = courseService.getCourse(id);
+		} catch (EntityNotFoundException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+		}
+
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<?> deleteCourse(@PathVariable Long id) {
+
+		try {
+			courseService.deleteCourse(id);
+		} catch (EntityNotFoundException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+		}
+
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 }
